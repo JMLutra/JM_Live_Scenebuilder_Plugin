@@ -52,12 +52,17 @@ function Setup()
             'If you want to Cancel the Setup, press "Cancel", otherwise press "OK" to continue.\n' ..
             '(In order to streamline the setup in the future you can set the variables "UsePreConf", "Screen", "BuilderView" and "SafeView" in the plugin to your desired values)'
     else
+        local execs = ''
+        for i = 1, Tablelength(Executors) do
+            execs = execs .. ', ' .. Executors[i]
+        end
+        execs = string.sub(execs, 3)
         s =
             'Welcome to the Live Scenebuilder Setup!\n\nDue to the variable "UsePreConf" being set to true, the following Values will be used:\n' ..
             '- Screen: ' .. Screen .. '\n' ..
             '- BuilderView: ' .. BuilderView .. '\n' ..
             '- SafeView: ' .. SafeView .. '\n' ..
-            '- Executors: ' .. tostring(Executors) .. '\n\n' ..
+            '- Executors: ' .. execs .. '\n\n' ..
             'If you want to use those values, press "OK", otherwise press "Cancel" and go through the setup normally.'
     end
     if not Gui.confirm('Live Scenebuilder Setup', s) then
@@ -125,11 +130,13 @@ function SetupScreen()
     if gma.show.getvar('OS') == 'WINDOWS' then
         path = string.gsub(path, '/', '\\')
     end
+    
     Feed('Modifying the XML')
-    ModifyFile('<Widget index="0" type="4d414352"', ' scroll_offset="1" scroll_index="'..index..'"', '>', path)
+    local index = 1
+    ModifyFile('<Widget index="0" type="4d414352"', ' scroll_offset="'..index..'" scroll_index="'..index..'"', '>', path)
     Cmd('Import \"JM_CreateBuilderView\" At View '..BuilderView..'/nc /o /p=\"' .. gma.show.getvar('TEMPPATH') .. '\"' )
     Cmd('View '..BuilderView..'/Screen='..Screen)
-    Gui.msgbox('Scenebuilder Setup', 'Now you can create your Live Scenebuilder View.\nIt works by storing the Programmer values into an executor, \nso keep in mind that it\'s not possible to use other Executors within a Live Scene \nYou can pretty much do what you want, \nonly the Macropool in the top left corner has to be somewhere on the view.\n In the end just activate the macro and your view will be stored.')
+    Gui.msgbox('Scenebuilder Setup', 'Now you can create your Live Scenebuilder View.\nIt works by storing the Programmer values into an executor, \nso keep in mind that it\'s not possible to use other Executors within a Live Scene \nYou can pretty much do what you want, \nonly the Macropool in the top left corner has to be somewhere on the view.\n In the end just activate the "Finish Setup" macro and your view will be stored.')
     gma.sleep(5)
     Cmd('View '..SafeView..'/Screen='..Screen)
 end
